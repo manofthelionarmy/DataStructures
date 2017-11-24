@@ -40,6 +40,8 @@ public:
 	void removeNode(int& value); 
 
 	void clear(); 
+
+	void printNodes(); 
 };
 
 bool LinkedList::isEmpty(){
@@ -54,7 +56,7 @@ void LinkedList::addNode(Node *n){
 	}
 	else{
 		tail->next = n; 
-		tail = tail->next; 
+		tail = n; 
 		return; 
 	}
 }
@@ -65,21 +67,53 @@ void LinkedList::removeNode(int& value){
 	while(temp != NULL){
 		if(temp->value == value){
 
-			cout << "Found value " << value << " at key " << temp->key << ". Successfully deleted." << endl; 
+			cout << "Successfully deleted " << temp->value << "." << endl; 
+
+			if(head == tail){
+				head = NULL; 
+				tail = NULL; 
+				delete temp; 
+				return; 
+			}
+
+			else if(temp == tail){
+				tail = head; 
+				tail->next = NULL; 
+				delete temp; 
+				return; 
+			}
 
 			head = temp->next; 
-			temp->next = NULL; 
+
+			if(head == NULL){
+				tail = NULL; 
+			}
 
 			delete temp; 
 
 			return; 
 		}
 		else{
-			temp = temp->next; 
-		}
+			temp = temp->next;		
+		} 
 	}
 
 	cout << "Value doesn't exist." << endl; 
+}
+
+void LinkedList::printNodes(){
+	if(isEmpty()){
+		cout << "-> NULL" << endl;
+		return; 
+	}
+	else{
+		Node * temp = head; 
+
+		while(temp != NULL){
+			cout << "-> " << temp->value << " "; 
+			temp = temp->next; 
+		}
+	}
 }
 
 void LinkedList::clear(){
@@ -139,11 +173,15 @@ public:
 
 	int search(int &value) const; 
 
-	//void print(); //this function will print out all the values in the hashtable
+	void print(); //this function will print out all the values in the hashtable
 }; 
 
 int HashTable::hashcode(int& value) const{
 	int key = length % value; 
+
+	if(key == length){
+		key -= 1; 
+	}
 
 	return key; 
 }
@@ -165,14 +203,14 @@ int HashTable::search(int &value) const{
 
 	int index = hashcode(value); 
 
-	if(hashtable[index] != NULL){
+	if(hashtable[index]->isEmpty()){
+		return -1; 
+	}
+	else{
 
 		cout << "Found value " << value << " at key " << index << "." <<  endl; 
 
 		return index; 
-	}
-	else{
-		return -1; 
 	}
 }
 
@@ -185,22 +223,34 @@ void HashTable::remove(int& value){
 	}
 	else{
 
-		LinkedList *l = hashtable[index]; 
-		l->removeNode(value); 
-
-		l = NULL; 
+		hashtable[index]->removeNode(value); 
 
 		return; 
 	}
 }
 
+void HashTable::print(){
+
+	for(int i = 0; i < length; ++i){
+
+		cout << "Key: [" << i << "] "; 
+		hashtable[i]->printNodes(); 
+		cout << endl;
+	}
+
+
+	return; 
+}
+
 
 void printOperations(){
 
-	cout << "i ------ insert(): insert a value into the hashtable\n";
-	cout << "r ------ remove(): remove a value from the hashtable\n"; 
-	cout << "s ------ search(): find the key of the value\n"; 
-	cout << "q ------ quit():   quit the program\n";
+	cout << "i ------ insert():  insert a value into the hashtable\n";
+	cout << "r ------ remove():  remove a value from the hashtable\n"; 
+	cout << "s ------ search():  find the key of the value\n"; 
+	cout << "p ------ print():   print out the hashtable\n"; 
+	cout << "o ------ options(): print out the options\n";
+	cout << "q ------ quit():    quit the program\n";
 }
 
 
@@ -241,12 +291,18 @@ int main(){
 					cout << "Value doesn't exist" << endl;
 				}
 			break; 
+			case 'o':
+				printOperations(); 
+			break; 
+			case 'p':
+				h->print(); 
+			break; 
 			default:
 				cout << "Option doesn't exist. Try again." << endl; 
 			break; 
 		}
 
-		cout << "Enter opiton: ";
+		cout << "Enter option: ";
 		cin >> option; 
 	}
 
