@@ -28,7 +28,7 @@ public:
 		tail = NULL; 
 	}
 	~LinkedList(){
-
+		clear(); 
 	}
 
 	friend class HashTable;  
@@ -45,60 +45,68 @@ public:
 };
 
 bool LinkedList::isEmpty(){
+
 	return head == NULL && tail == NULL; 
 }
 
 void LinkedList::addNode(Node *n){
 	if(isEmpty()){
+		
 		head = n; 
-		tail = head; 
+		tail = head;  
 		return; 
 	}
-	else{
-		tail->next = n; 
-		tail = n; 
-		return; 
-	}
+	
+	tail->next = n; 
+	tail = n; 
+
+	return; 
 }
 void LinkedList::removeNode(int& value){
 
-	Node * temp = head; 
+	Node * runner1 = head; 
+	Node * runner2 = runner1->next; 
 
-	while(temp != NULL){
-		if(temp->value == value){
-
-			cout << "Successfully deleted " << temp->value << "." << endl; 
-
-			if(head == tail){
-				head = NULL; 
-				tail = NULL; 
-				delete temp; 
-				return; 
-			}
-
-			else if(temp == tail){
-				tail = head; 
-				tail->next = NULL; 
-				delete temp; 
-				return; 
-			}
-
-			head = temp->next; 
+	if(runner1->value == value){
+		if(runner1 == head){
+			head = runner1->next; 
 
 			if(head == NULL){
 				tail = NULL; 
 			}
 
-			delete temp; 
+			runner1->next = NULL; 
 
-			return; 
+			delete runner1; 
+		}
+	}
+	else{
+
+		while(runner2 != NULL){
+		if(runner2->value == value){
+			cout << "Succesfully deleted " << endl ;
+			runner1->next = runner2->next; 
+
+			if(runner1->next == NULL){
+				tail = runner1; 
+			}
+
+			runner2->next = NULL; 
+			delete runner2; 
+			return;
+			
 		}
 		else{
-			temp = temp->next;		
+			runner1 = runner1->next; 
+			runner2 = runner2->next; 		
 		} 
 	}
 
 	cout << "Value doesn't exist." << endl; 
+
+	}
+
+	
 }
 
 void LinkedList::printNodes(){
@@ -147,7 +155,7 @@ public:
 	HashTable(int m){
 
 		length = m; 
-		LinkedList ** hashtable = new LinkedList*[length]; 
+		hashtable = new LinkedList*[length]; 
 
 		for(int i = 0; i < length; ++i){
 			hashtable[i] = new LinkedList(); 
@@ -158,7 +166,7 @@ public:
 		
 		for(int i = 0; i < length; ++i){
 			LinkedList * temp = hashtable[i]; 
-
+			hashtable[i] = NULL; 
 			delete temp; 
 		}
 
@@ -171,9 +179,9 @@ public:
 
 	void remove(int &value); 
 
-	int search(int &value) const; 
+	const int search(int &value); 
 
-	void print(); //this function will print out all the values in the hashtable
+	void print(); 
 }; 
 
 int HashTable::hashcode(int& value) const{
@@ -194,12 +202,15 @@ void HashTable::insert(int& value){
 
 	n->next = NULL;
 
-	hashtable[key]->addNode(n);
+	hashtable[key]->addNode(n);  
+
+
 
 	return; 
 }
 
-int HashTable::search(int &value) const{
+const int HashTable::search(int &value)
+{
 
 	int index = hashcode(value); 
 
